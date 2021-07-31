@@ -1,35 +1,39 @@
 import * as THREE from './three.module.js';
 
-let camera, scene, renderer;
-let geometry, material, mesh;
+function main() {
+  const canvas = document.querySelector('#entryCanvas');
+  const renderer = new THREE.WebGLRenderer({canvas});
 
-init();
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.z = 2;
 
-function init() {
+  const scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-	camera.position.z = 1;
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-	scene = new THREE.Scene();
+  const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 
-	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-	material = new THREE.MeshNormalMaterial();
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
 
-	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
+  // # 아래부분이 추가되었음
+  function render(time) {
+    time *= 0.001;  // convert time to seconds
+    cube.rotation.x = time;
+    cube.rotation.y = time;
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setAnimationLoop( animation );
-	document.body.appendChild( renderer.domElement );
+    renderer.render(scene, camera);
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
 
 }
 
-function animation( time ) {
-
-	mesh.rotation.x = time / 2000;
-	mesh.rotation.y = time / 1000;
-
-	renderer.render( scene, camera );
-
-}
+main();
